@@ -1,6 +1,5 @@
 import { RemoteServerCache } from './RemoteServerCache';
 import { Bridge } from '../../Manager/Bridge';
-import { RawMessage } from 'discord-hybrid-sharding';
 export declare class CacheServer {
     server: Bridge;
     path: {
@@ -15,10 +14,10 @@ export declare class CacheServer {
         }>;
     });
     _overwriteHandlers(): void;
-    _handleCacheSet(message: RawMessage, res: (data: any) => Promise<void>): Promise<void> | undefined;
-    _handleCacheGet(message: RawMessage, res: (data: any) => Promise<void>): Promise<void> | undefined;
-    _handleCacheDelete(message: RawMessage, res: (data: any) => Promise<void>): Promise<void> | undefined;
-    _handleCacheClear(message: RawMessage, res: (data: any) => Promise<void>): Promise<void> | undefined;
+    _handleCacheSet(message: any, res: (data: any) => Promise<void>): Promise<void> | undefined;
+    _handleCacheGet(message: any, res: (data: any) => Promise<void>): Promise<void> | undefined;
+    _handleCacheDelete(message: any, res: (data: any) => Promise<void>): Promise<void> | undefined;
+    _handleCacheClear(message: any, res: (data: any) => Promise<void>): Promise<void> | undefined;
     _buildCachePaths(path: {
         path: string;
         maxSize: number;

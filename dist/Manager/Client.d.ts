@@ -1,8 +1,6 @@
-import { ClusterManager, evalOptions } from 'discord-hybrid-sharding';
-import { ClientEvents } from 'discord.js';
 import { Client as NetIPCClient, ClientOptions as NetIPCClientOptions } from 'net-ipc';
 import { RawMessage } from '../Structures/IPCMessage';
-import { CrossHostMessage } from '../types/shared';
+import { ClientEvents, CrossHostMessage, evalOptions } from '../types/shared';
 export interface ClientOptions extends NetIPCClientOptions {
     authToken: string;
     agent: string;
@@ -16,7 +14,7 @@ export declare class Client extends NetIPCClient {
     rollingRestarts: boolean;
     shardList: number[];
     totalShards: number;
-    manager?: ClusterManager & {
+    manager?: any & {
         netipc?: Client;
     };
     clusterList: never[];
@@ -29,9 +27,7 @@ export declare class Client extends NetIPCClient {
         maxClusters?: number;
         timeout?: number;
     }): Promise<any>;
-    listen(manager: ClusterManager): ClusterManager & {
-        netipc?: Client | undefined;
-    };
+    listen(manager: any): any;
     broadcastEval(script: string, options?: evalOptions & {
         script?: string;
     }): Promise<any>;

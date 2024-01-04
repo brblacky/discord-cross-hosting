@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bridge = void 0;
 const net_ipc_1 = require("net-ipc");
 const IPCMessage_1 = require("../Structures/IPCMessage");
-const discord_hybrid_sharding_1 = require("discord-hybrid-sharding");
+const utils_1 = require("../Utils/utils");
 const shared_1 = require("../types/shared");
 class Bridge extends net_ipc_1.Server {
     constructor(options) {
@@ -215,7 +215,7 @@ class Bridge extends net_ipc_1.Server {
                     throw new Error('CLIENT_MISSING_OPTION - ' +
                         'A token must be provided when getting shard count on auto -' +
                         'Add the Option token: DiscordBOTTOKEN');
-                this.totalShards = yield (0, discord_hybrid_sharding_1.fetchRecommendedShards)(this.token, 1000);
+                this.totalShards = yield (0, utils_1.fetchRecommendedShards)(this.token, 1000);
                 this.shardList = Array.from(Array(this.totalShards).keys());
             }
             else {
@@ -240,7 +240,7 @@ class Bridge extends net_ipc_1.Server {
                     'bigger than the highest shardID in the shardList option.');
             }
             const clusterAmount = Math.ceil(this.shardList.length / this.shardsPerCluster);
-            const ClusterList = (0, discord_hybrid_sharding_1.chunkArray)(this.shardList, Math.ceil(this.shardList.length / clusterAmount));
+            const ClusterList = (0, utils_1.chunkArray)(this.shardList, Math.ceil(this.shardList.length / clusterAmount));
             this.shardClusterList = this.parseClusterList(ClusterList);
             this.shardClusterListQueue = this.shardClusterList.slice(0);
             this._debug(`Created shardClusterList: ${JSON.stringify(this.shardClusterList)}`);
@@ -257,7 +257,7 @@ class Bridge extends net_ipc_1.Server {
         });
     }
     parseClusterList(ClusterList) {
-        return (0, discord_hybrid_sharding_1.chunkArray)(ClusterList, Math.ceil(ClusterList.length / this.totalMachines));
+        return (0, utils_1.chunkArray)(ClusterList, Math.ceil(ClusterList.length / this.totalMachines));
     }
     broadcastEval(script, options) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -278,7 +278,7 @@ class Bridge extends net_ipc_1.Server {
         return __awaiter(this, void 0, void 0, function* () {
             if (!(message === null || message === void 0 ? void 0 : message.guildId))
                 throw new Error('GuildID has not been provided!');
-            const internalShard = (0, discord_hybrid_sharding_1.shardIdForGuildId)(message.guildId, this.totalShards);
+            const internalShard = (0, utils_1.shardIdForGuildId)(message.guildId, this.totalShards);
             const targetClient = Array.from(this.clients.values()).find(x => { var _a, _b; return (_b = (_a = x === null || x === void 0 ? void 0 : x.shardList) === null || _a === void 0 ? void 0 : _a.flat()) === null || _b === void 0 ? void 0 : _b.includes(internalShard); });
             if (!targetClient)
                 throw new Error('Internal Shard not found!');

@@ -1,7 +1,6 @@
 import { Connection, Server, ServerOptions } from 'net-ipc';
 import { RawMessage } from '../Structures/IPCMessage';
-import { evalOptions } from 'discord-hybrid-sharding';
-import { BridgeEvents, BroadcastEvalOptions } from '../types/shared';
+import { BridgeEvents, BroadcastEvalOptions, evalOptions } from '../types/shared';
 export interface BridgeOptions extends ServerOptions {
     authToken: string;
     standAlone?: Boolean;

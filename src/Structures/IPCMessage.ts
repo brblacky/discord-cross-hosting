@@ -1,6 +1,7 @@
-import { generateNonce, messageType } from 'discord-hybrid-sharding';
+
 import type { Client } from '../Manager/Client';
 import type { BridgeClient } from '../Manager/Bridge';
+import { generateNonce, messageType } from '../types/shared';
 
 export interface RawMessage {
     nonce?: string,

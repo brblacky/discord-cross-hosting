@@ -1,6 +1,29 @@
-import { evalOptions } from "discord-hybrid-sharding";
 import { ClientReadyEvent, Connection } from "net-ipc";
 import { IPCMessage } from "../Structures/IPCMessage";
+
+export function generateNonce() {
+    return Date.now().toString(36) + Math.random().toString(36);
+}
+
+export const DefaultOptions = {
+    http: {
+        api: 'https://discord.com/api',
+        version: '10',
+    },
+};
+
+export const Endpoints = {
+    botGateway: '/gateway/bot',
+};
+
+export interface evalOptions<T = object> {
+    cluster?: number | number[];
+    shard?: number;
+    guildId?: string;
+    context?: T;
+    timeout?: number;
+    _type?: messageType;
+}
 
 export interface BroadcastEvalOptions extends evalOptions {
     filter?(client: {agent: string}): Boolean;

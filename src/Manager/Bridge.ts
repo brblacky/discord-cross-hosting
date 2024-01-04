@@ -1,8 +1,8 @@
 import { Connection, Server, ServerOptions } from 'net-ipc';
 
 import { IPCMessage, RawMessage } from '../Structures/IPCMessage';
-import { chunkArray, evalOptions, fetchRecommendedShards, shardIdForGuildId } from 'discord-hybrid-sharding';
-import { BridgeEvents, BroadcastEvalOptions, messageType} from '../types/shared';
+import { chunkArray, fetchRecommendedShards, shardIdForGuildId } from '../Utils/utils';
+import { BridgeEvents, BroadcastEvalOptions, evalOptions, messageType} from '../types/shared';
 
 export interface BridgeOptions extends ServerOptions {
     /**

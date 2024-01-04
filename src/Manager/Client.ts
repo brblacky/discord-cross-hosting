@@ -1,10 +1,7 @@
-
-import { ClusterManager, Cluster, evalOptions } from 'discord-hybrid-sharding';
-import { ClientEvents } from 'discord.js';
 import { Client as NetIPCClient, ClientOptions as NetIPCClientOptions } from 'net-ipc';
 
 import { IPCMessage, BaseMessage, RawMessage } from '../Structures/IPCMessage';
-import { CrossHostMessage, messageType } from '../types/shared';
+import { ClientEvents, CrossHostMessage, evalOptions, messageType } from '../types/shared';
 
 export interface ClientOptions extends NetIPCClientOptions {
     /**
@@ -61,7 +58,7 @@ export class Client extends NetIPCClient {
     totalShards: number;
 
     /** Cluster Manager */
-    manager?: ClusterManager & {netipc?: Client};
+    manager?: any & { netipc?: Client };
     clusterList: never[];
     constructor(options: ClientOptions) {
         super(options);
@@ -85,8 +82,8 @@ export class Client extends NetIPCClient {
 
         this.on('ready', this._handleReady.bind(this));
 
-        this.on('message', this._handleMessage.bind(this) as any);
-         // @ts-expect-error
+        this.on('bridgeMessage', this._handleMessage.bind(this) as any);
+
         this.on('request', this._handleRequest.bind(this));
     }
 
@@ -115,7 +112,7 @@ export class Client extends NetIPCClient {
     private _handleMessage(message: RawMessage) {
         if (typeof message === 'string') message = JSON.parse(message);
         if (message._type === undefined) return;
-        
+
 
         if (message._type === messageType.SHARDLIST_DATA_UPDATE) {
             if (!this.rollingRestarts) return;
@@ -128,7 +125,7 @@ export class Client extends NetIPCClient {
                     bridge: true,
                 });
                 setTimeout(async () => {
-                    if(!this.manager) return;
+                    if (!this.manager) return;
                     const response = await this.requestShardData();
                     // if (!response?.shardList) return; -> Kill Old Clusters
                     this.manager.totalShards = response.totalShards;
@@ -165,8 +162,8 @@ export class Client extends NetIPCClient {
         if (message._type === messageType.SERVER_BROADCAST_REQUEST) {
             if (!this.manager) throw new Error(`A Cluster/Shard Manager has not been loaded to net-ipc`);
             message._type = messageType.CLIENT_BROADCAST_RESPONSE;
-            this.manager.broadcastEval(message.script, message.options)?.then(e => res(e))
-                .catch(e => res(e));
+            this.manager.broadcastEval(message.script, message.options)?.then((e: any) => res(e))
+                .catch((e: any) => res(e));
             return;
         }
 
@@ -177,10 +174,10 @@ export class Client extends NetIPCClient {
             // Find Shard
 
             if (!isNaN(message.options.shard)) {
-                const findCluster = Array.from(this.manager.clusters.values()).find((i: Cluster) => {
-                    if(!i) return false;
-                   return i.shardList.includes(message.options.shard);
-                });
+                const findCluster = Array.from(this.manager.clusters.values()).find((i: any) => {
+                    if (!i) return false;
+                    return i.shardList.includes(message.options.shard);
+                }) as any;
                 message.options.cluster = findCluster ? findCluster.id : 0;
                 // console.log(`Guild Data Cluster Request: ${message.options.cluster}`)
             } else return res({ error: 'No Shard has been provided!', ...message });
@@ -190,16 +187,16 @@ export class Client extends NetIPCClient {
                 return res({ ...message, error: `Cluster ${message.options.cluster} not found!` });
             cluster
                 .request(message)
-                .then(e => res(e))
-                .catch(e => res({ ...message, error: e }));
+                .then((e: any) => res(e))
+                .catch((e: any) => res({ ...message, error: e }));
             return;
         }
         if (message._type === messageType.GUILD_EVAL_REQUEST) {
             if (!this.manager) throw new Error(`A Cluster/Shard Manager has not been loaded to net-ipc`);
             message._type = messageType.GUILD_EVAL_RESPONSE;
             this.manager
-                .evalOnCluster(message.script, message.options)?.then(e => res(e))
-                .catch(e => res(e));
+                .evalOnCluster(message.script, message.options)?.then((e: any) => res(e))
+                .catch((e: any) => res(e));
             return;
         }
         let emitMessage;
@@ -213,8 +210,8 @@ export class Client extends NetIPCClient {
      * @param options
      * @returns The ShardList, TotalShards and other Data requested from the Bridge
      */
-    public async requestShardData(options: {maxClusters?: number, timeout?: number} = {}) {
-        const message = {_type: messageType.SHARDLIST_DATA_REQUEST, maxClusters: options.maxClusters};
+    public async requestShardData(options: { maxClusters?: number, timeout?: number } = {}) {
+        const message = { _type: messageType.SHARDLIST_DATA_REQUEST, maxClusters: options.maxClusters };
         const response = await super.request(message, options.timeout);
         this._debug(`Given Shard Data: ${JSON.stringify(response)}`, { bridge: true });
         if (!response) throw new Error(`No Response from Server`);
@@ -230,7 +227,7 @@ export class Client extends NetIPCClient {
      * Listens to NET-IPC messages such as BroadcastEval or Normal Messages
      * @param manager the Shard/Cluster Manager, which should be listened on.
      */
-    public listen(manager: ClusterManager) {
+    public listen(manager: any) {
         if (!manager) throw new Error(`A Cluster/Shard Manager has not been provided`);
         this.manager = manager;
 
@@ -249,7 +246,7 @@ export class Client extends NetIPCClient {
      *   .catch(console.error);
      * @see {@link Server#broadcastEval}
      */
-    public async broadcastEval(script: string, options: evalOptions & {script?: string} = {}) {
+    public async broadcastEval(script: string, options: evalOptions & { script?: string } = {}) {
         if (options.script) script = options.script;
         if (!script || (typeof script !== 'string' && typeof script !== 'function'))
             throw new Error('Script for BroadcastEvaling has not been provided or must be a valid String!');
@@ -319,7 +316,7 @@ export class Client extends NetIPCClient {
      *   .then(result => console.log(result)) // hi
      *   .catch(console.error);
      */
-    public async requestToGuild(message: RawMessage & {guildId: string}, options?: evalOptions) {
+    public async requestToGuild(message: RawMessage & { guildId: string }, options?: evalOptions) {
         if (!message.guildId) throw new Error('GuildID has not been provided!');
         if (!message.eval) message._type = messageType.GUILD_DATA_REQUEST;
         else message._type = messageType.GUILD_EVAL_REQUEST;
@@ -337,7 +334,7 @@ export class Client extends NetIPCClient {
      *   .then(result => console.log(result)) // hi
      *   .catch(console.error);
      */
-    public async requestToClient(message: RawMessage & {clientId: string}, options?: evalOptions) {
+    public async requestToClient(message: RawMessage & { clientId: string }, options?: evalOptions) {
         if (!message.agent && !message.clientId) throw new Error('Agent has not been provided!');
         message._type = messageType.CLIENT_DATA_REQUEST;
         if (!message.options) message.options = options || {};
@@ -349,7 +346,7 @@ export class Client extends NetIPCClient {
      * @private
      */
     private rollingRestart() {
-        if(!this.manager) throw new Error("No Manager was found")
+        if (!this.manager) throw new Error("No Manager was found")
         this._debug(`[RollingRestart] ShardClusterList: ${JSON.stringify(this.manager.shardClusterList)}`);
 
         if (!this.rollingRestarts) return;
@@ -367,7 +364,7 @@ export class Client extends NetIPCClient {
      * <warn>Using this method just emits the Debug Event.</warn>
      * <info>This is usually not necessary to manually specify.</info>
      */
-    private _debug(message: string, options: {bridge?: Boolean} = {}) {
+    private _debug(message: string, options: { bridge?: Boolean } = {}) {
         let log;
         if (options.bridge) {
             log = `[Bridge => CM] ` + message;

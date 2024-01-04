@@ -30,7 +30,7 @@ class Client extends net_ipc_1.Client {
         this.clusterList = [];
         this.totalShards = -1;
         this.on('ready', this._handleReady.bind(this));
-        this.on('message', this._handleMessage.bind(this));
+        this.on('bridgeMessage', this._handleMessage.bind(this));
         this.on('request', this._handleRequest.bind(this));
     }
     connect(args = {}) {
@@ -90,7 +90,7 @@ class Client extends net_ipc_1.Client {
             if (!this.manager)
                 throw new Error(`A Cluster/Shard Manager has not been loaded to net-ipc`);
             message._type = shared_1.messageType.CLIENT_BROADCAST_RESPONSE;
-            (_a = this.manager.broadcastEval(message.script, message.options)) === null || _a === void 0 ? void 0 : _a.then(e => res(e)).catch(e => res(e));
+            (_a = this.manager.broadcastEval(message.script, message.options)) === null || _a === void 0 ? void 0 : _a.then((e) => res(e)).catch((e) => res(e));
             return;
         }
         if (message._type === shared_1.messageType.GUILD_DATA_REQUEST) {
@@ -112,8 +112,8 @@ class Client extends net_ipc_1.Client {
                 return res(Object.assign(Object.assign({}, message), { error: `Cluster ${message.options.cluster} not found!` }));
             cluster
                 .request(message)
-                .then(e => res(e))
-                .catch(e => res(Object.assign(Object.assign({}, message), { error: e })));
+                .then((e) => res(e))
+                .catch((e) => res(Object.assign(Object.assign({}, message), { error: e })));
             return;
         }
         if (message._type === shared_1.messageType.GUILD_EVAL_REQUEST) {
@@ -121,7 +121,7 @@ class Client extends net_ipc_1.Client {
                 throw new Error(`A Cluster/Shard Manager has not been loaded to net-ipc`);
             message._type = shared_1.messageType.GUILD_EVAL_RESPONSE;
             (_b = this.manager
-                .evalOnCluster(message.script, message.options)) === null || _b === void 0 ? void 0 : _b.then(e => res(e)).catch(e => res(e));
+                .evalOnCluster(message.script, message.options)) === null || _b === void 0 ? void 0 : _b.then((e) => res(e)).catch((e) => res(e));
             return;
         }
         let emitMessage;

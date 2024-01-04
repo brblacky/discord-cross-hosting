@@ -2,7 +2,6 @@
 import { RemoteServerCache }from './RemoteServerCache';
 import { messageType } from '../../types/shared';
 import { Bridge } from '../../Manager/Bridge';
-import { RawMessage } from 'discord-hybrid-sharding';
 import { Connection } from 'net-ipc';
 export class CacheServer {
     server: Bridge;
@@ -20,7 +19,7 @@ export class CacheServer {
         const { _handleRequest } = this.server;
         //Remove all request listerns
         this.server.off('request', _handleRequest);
-        this.server.on('request', (message: RawMessage, res, client) => {
+        this.server.on('request', (message: any, res, client) => {
             if (typeof message === 'string') message = JSON.parse(message);
             if (message?._type === undefined) return;
             if (!this.server.clients.has(client.id)) return;
@@ -40,7 +39,7 @@ export class CacheServer {
         });
     }
 
-    _handleCacheSet(message: RawMessage, res: (data: any) => Promise<void>) {
+    _handleCacheSet(message: any, res: (data: any) => Promise<void>) {
         if (!message.path) return res({ _error: 'missing cache path' });
         if (!message.data) return res({ _error: 'missing cache meta data' });
         if (!this.cache[message.path]) return res({ _error: 'cache path does not exist' });
@@ -48,7 +47,7 @@ export class CacheServer {
         res({ success: true });
     }
 
-    _handleCacheGet(message: RawMessage, res: (data: any) => Promise<void>) {
+    _handleCacheGet(message: any, res: (data: any) => Promise<void>) {
         if (!message.path) return res({ _error: 'missing cache path' });
         if (!this.cache[message.path]) return res({ _error: 'cache path does not exist' });
         const value = this.cache[message.path]?.get(message.data.key);
@@ -56,14 +55,14 @@ export class CacheServer {
         res(value);
     }
 
-    _handleCacheDelete(message: RawMessage, res: (data: any) => Promise<void>) {
+    _handleCacheDelete(message: any, res: (data: any) => Promise<void>) {
         if (!message.path) return res({ _error: 'missing cache path' });
         if (!this.cache[message.path]) return res({ _error: 'cache path does not exist' });
         this.cache[message.path]?.delete(message.key);
         res({ success: true });
     }
 
-    _handleCacheClear(message: RawMessage, res: (data: any) => Promise<void>) {
+    _handleCacheClear(message: any, res: (data: any) => Promise<void>) {
         if (!message.path) return res({ _error: 'missing cache path' });
         if (!this.cache[message.path]) return res({ _error: 'cache path does not exist' });
         this.cache[message.path]?.clear();

@@ -1,10 +1,10 @@
-import { ClusterClient, evalOptions } from 'discord-hybrid-sharding';
+
 import { BaseMessage, RawMessage } from '../Structures/IPCMessage';
-import { CrossHostMessage, messageType } from '../types/shared';
+import { CrossHostMessage, evalOptions, messageType } from '../types/shared';
 
 export class Shard {
-    shard: ClusterClient;
-    constructor(shard: ClusterClient) {
+    shard: any;
+    constructor(shard: any) {
         this.shard = shard;
     }
 

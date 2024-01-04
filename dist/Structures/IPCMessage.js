@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IPCMessage = exports.BaseMessage = void 0;
-const discord_hybrid_sharding_1 = require("discord-hybrid-sharding");
+const shared_1 = require("../types/shared");
 class BaseMessage {
     constructor(message) {
-        this.nonce = message.nonce || (0, discord_hybrid_sharding_1.generateNonce)();
+        this.nonce = message.nonce || (0, shared_1.generateNonce)();
         message.nonce = this.nonce;
         this._raw = this.destructMessage(message);
     }
@@ -23,7 +23,7 @@ class BaseMessage {
         }
         if (message.nonce)
             this.nonce = message.nonce;
-        this._type = message._type || discord_hybrid_sharding_1.messageType.CUSTOM_MESSAGE;
+        this._type = message._type || shared_1.messageType.CUSTOM_MESSAGE;
         return message;
     }
     toJSON() {
@@ -42,7 +42,7 @@ class IPCMessage extends BaseMessage {
         return __awaiter(this, void 0, void 0, function* () {
             if (typeof message !== 'object')
                 throw new TypeError('The Message has to be a object');
-            const baseMessage = new BaseMessage(Object.assign(Object.assign({}, message), { _type: discord_hybrid_sharding_1.messageType.CUSTOM_MESSAGE }));
+            const baseMessage = new BaseMessage(Object.assign(Object.assign({}, message), { _type: shared_1.messageType.CUSTOM_MESSAGE }));
             return this.instance.send(baseMessage.toJSON());
         });
     }
@@ -50,7 +50,7 @@ class IPCMessage extends BaseMessage {
         return __awaiter(this, void 0, void 0, function* () {
             if (typeof message !== 'object')
                 throw new TypeError('The Message has to be a object');
-            const baseMessage = new BaseMessage(Object.assign(Object.assign({}, message), { _type: discord_hybrid_sharding_1.messageType.CUSTOM_REQUEST, nonce: this.nonce }));
+            const baseMessage = new BaseMessage(Object.assign(Object.assign({}, message), { _type: shared_1.messageType.CUSTOM_REQUEST, nonce: this.nonce }));
             return this.instance.request(baseMessage.toJSON());
         });
     }
@@ -59,7 +59,7 @@ class IPCMessage extends BaseMessage {
         return __awaiter(this, void 0, void 0, function* () {
             if (typeof message !== 'object')
                 throw new TypeError('The Message has to be a object');
-            const baseMessage = new BaseMessage(Object.assign(Object.assign({}, message), { _type: discord_hybrid_sharding_1.messageType.CUSTOM_REPLY, nonce: this.nonce, _result: message }));
+            const baseMessage = new BaseMessage(Object.assign(Object.assign({}, message), { _type: shared_1.messageType.CUSTOM_REPLY, nonce: this.nonce, _result: message }));
             return (_a = this.res) === null || _a === void 0 ? void 0 : _a.call(this, baseMessage.toJSON());
         });
     }

@@ -5,14 +5,14 @@
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "dependencies": {
-        "discord-hybrid-sharding": "github:meister03/discord-hybrid-sharding",
-        "discordeno": "^16.0.1",
-        "net-ipc": "^2.0.1"
+        "discordeno": "^18.0.1",
+        "net-ipc": "^2.1.0"
     },
     "scripts": {
         "lint": "eslint . --ext .js",
         "lint:fix": "eslint . --fix --ext .js",
         "format": "prettier --check .",
+        "build": "tsc",
         "format:fix": "prettier --write .",
         "start:bridge": "node test/server.js",
         "start:cluster": "node test/cluster.js"
@@ -44,14 +44,15 @@
     },
     "homepage": "https://github.com/meister03/discord-cross-hosting#readme",
     "devDependencies": {
-        "@types/node": "^18.7.18",
-        "discord.js": "^13.3.1",
-        "eslint": "^8.10.0",
-        "eslint-config-prettier": "^8.5.0",
-        "eslint-plugin-jsdoc": "^37.9.6",
-        "eslint-plugin-prettier": "^4.0.0",
-        "express": "^4.17.1",
-        "prettier": "^2.5.1",
-        "typescript": "^4.8.3"
+        "@types/node": "^20.10.6",
+        "@types/node-fetch": "^2.6.10",
+        "discord.js": "^14.14.1",
+        "eslint": "^8.56.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-jsdoc": "^48.0.2",
+        "eslint-plugin-prettier": "^5.1.2",
+        "express": "^4.18.2",
+        "prettier": "^3.1.1",
+        "typescript": "^5.3.3"
     }
 }
